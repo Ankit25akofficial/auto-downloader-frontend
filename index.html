@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Auto Downloader</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f4f4f4; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+    input, button { width: 100%; padding: 1rem; margin: 0.5rem 0; font-size: 1rem; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🔗 Auto Downloader</h2>
+    <input type="text" id="fileLink" placeholder="Enter file URL here" />
+    <button onclick="downloadFile()">Download</button>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    async function downloadFile() {
+      const link = document.getElementById('fileLink').value;
+      const status = document.getElementById('status');
+
+      if (!link) {
+        status.textContent = "Please enter a link!";
+        return;
+      }
+
+      status.textContent = "Downloading...";
+
+      try {
+        const response = await fetch("http://localhost:3000/download", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ fileUrl: link })
+        });
+
+        const result = await response.json();
+        if (result.message) {
+          status.textContent = `✅ ${result.message}: ${result.fileName}`;
+        } else {
+          status.textContent = `❌ Error: ${result.error}`;
+        }
+      } catch (error) {
+        status.textContent = `❌ Failed: ${error.message}`;
+      }
+    }
+  </script>
+</body>
+</html>
